@@ -1,0 +1,14 @@
+{
+    "ArrayOfSettingData": {
+        "DefaultSetting": {
+            "FullScreen": true,
+            "Resolution": {
+                "Width": 1920,
+                "Height": 1080
+            },
+            "Music":  true,
+            "Sound": true,
+            "Language": "en"
+        }
+    }
+}
