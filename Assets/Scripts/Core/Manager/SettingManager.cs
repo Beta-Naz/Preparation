@@ -1,7 +1,12 @@
 using Assets.Scripts.Core;
+using Assets.Scripts.Core.Classes.Setting;
+using Assets.Scripts.Core.Enums;
 using Assets.Scripts.Core.Interface;
+using Assets.Scripts.Data.SettingsDatas;
+using Assets.Scripts.UI.Dropdown;
 using System;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 public class SettingManager : BaseManager, IInitializable
@@ -28,6 +33,7 @@ public class SettingManager : BaseManager, IInitializable
         _kostil = false;
     }
     public static SettingManager Instance { get; private set; }
+    private SettingStorage _settingStorage;
     private bool _isUpdate = false;
     public SettingDatas DefaultSettingData;
     public bool IsUpdate => _isUpdate;
@@ -47,6 +53,7 @@ public class SettingManager : BaseManager, IInitializable
         transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
         _newSetting = new Dictionary<string, object>();
+        _settingStorage = new SettingStorage();
         Debug.Log($"менеджер SettingManager успешно инициализирован");
     }
 
@@ -179,6 +186,53 @@ public class SettingManager : BaseManager, IInitializable
             return false;
         }
     }
+    private bool IsNewSettingInternal<T>(TypeSetting key, object value, Func<T> loadFunc,TypeSetting expectedKey)
+    {
+        if (key != expectedKey) return false;
+        if (value is T typedValue)
+        {
+            return !Equals(typedValue, loadFunc());
+        }
+        return false;
+    }
+    private void SaveNewSettingInternal<T>(TypeSetting key, object value, Action<T> saveAction, TypeSetting expectedKey)
+    {
+        if (key != expectedKey) return;
+        if (value is T typedValue)
+        {
+            saveAction(typedValue);
+        }
+    }
+    private bool IsNewSetting(TypeSetting key, object value)
+    {
+        if (value == null) return false;
+        return IsNewResolution(key, value) ||
+            IsNewSound(key, value) ||
+            IsNewMusic(key, value) ||
+            IsNewFullscreen(key, value) ||
+            IsNewLanguage(key, value);
+    }
+    private bool IsNewLanguage(TypeSetting key, object value) =>
+        IsNewSettingInternal<string>(key, value, () => _settingStorage.LoadLanguage(), TypeSetting.language);
+    private void SaveNewLanguage(TypeSetting key, object value) =>
+        SaveNewSettingInternal<string>(key, value, lang => _settingStorage.SaveLanguage(lang), TypeSetting.fullscreen);
+    private bool IsNewFullscreen(TypeSetting key, object value) =>
+        IsNewSettingInternal<bool>(key, value, () => _settingStorage.LoadFullscreen(), TypeSetting.fullscreen);
+    private void SaveNewFullscreen(TypeSetting key, object value) =>
+        SaveNewSettingInternal<bool>(key, value, lang => _settingStorage.SaveFullscreen(lang), TypeSetting.fullscreen);
+    private bool IsNewMusic(TypeSetting key, object value) =>
+        IsNewSettingInternal<bool>(key, value, () => _settingStorage.LoadMusic(), TypeSetting.music);
+    private void SaveNewMusic(TypeSetting key, object value) =>
+        SaveNewSettingInternal<bool>(key, value, lang => _settingStorage.SaveMusic(lang), TypeSetting.music);
+    private bool IsNewSound(TypeSetting key, object value) =>
+        IsNewSettingInternal<bool>(key, value, () => _settingStorage.LoadSound(), TypeSetting.sound);
+    private void SaveNewSound(TypeSetting key, object value) =>
+        SaveNewSettingInternal<bool>(key, value, lang => _settingStorage.SaveSound(lang), TypeSetting.sound);
+    private bool IsNewResolution(TypeSetting key, object value) =>
+        IsNewSettingInternal<ResolutionData>(key, value, () => _settingStorage.LoadResolution(), TypeSetting.resolution);
+    private void SaveNewResolution(TypeSetting key, object value) =>
+        SaveNewSettingInternal<ResolutionData>(key, value, lang => _settingStorage.SaveResolution(lang), TypeSetting.resolution);
+
     private void AddSetting(string key)
     {
         Debug.Log($"ключ {key.ToLower()}");
@@ -198,8 +252,7 @@ public class SettingManager : BaseManager, IInitializable
                     {
                         if(int.Parse(mas[0]) is int width && int.Parse(mas[1]) is int height)
                         {
-                            PlayerPrefs.SetInt("Width", width);
-                            PlayerPrefs.SetInt("Height", height);
+
                         }
                     }
                 }
