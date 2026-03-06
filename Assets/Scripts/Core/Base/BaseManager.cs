@@ -8,7 +8,10 @@ public abstract class BaseManager : MonoBehaviour
     {
         return "NotFoundKey";
     }
-    public abstract void Unregister(string key);
+    public virtual void Unregister(string key) 
+    {
+        Debug.LogWarning("Вы забыли переиспользовать этот метод");
+    }
 
     protected void UpdateInitialize()
     {

@@ -1,14 +1,16 @@
 using Assets.Scripts.Core.Base;
+using Assets.Scripts.Core.Enums;
 using Assets.Scripts.Core.Interface;
 using UnityEngine;
 
 public class DDLanguage : BaseDropDown, IInvoke
 {
     [SerializeField] private string _invokeKey = "setting";
+    [SerializeField] private TypeSetting _settingKey = TypeSetting.language;
     public void Invoke()
     {
-        string language = PlayerPrefs.GetString("Language", "en");
-        if (SettingManager.Kostil) 
+        string language = SettingManager.SettingStorage.LoadLanguage();
+        if (SettingManager.IsDefaultSetting) 
         {
             language = SettingManager.DefaultSettingData.DefaultSetting.Language; 
         }
@@ -27,7 +29,7 @@ public class DDLanguage : BaseDropDown, IInvoke
     protected override void OnSelect(int index)
     {
         string value = ThisDropdown.options[index].text;
-        SettingManager.RegisterSetting(IdDropDowm, value[0..2]);
+        SettingManager.RegisterSetting(_settingKey, value[0..2]);
     }
     protected override void Start()
     {

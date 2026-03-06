@@ -1,36 +1,37 @@
 using Assets.Scripts.Core.Base;
+using Assets.Scripts.Core.Enums;
 using Assets.Scripts.Core.Interface;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
 public class BtnTgl: BaseButton, IInvoke
 {
     private Image _image;
     [SerializeField] private string _invokeKey = "setting";
+    [SerializeField] private TypeSetting _settingKey = TypeSetting.sound;
     public void Invoke()
     {
         bool isClick;
-        if (IdButton == "fullscreen")
+        if (_settingKey == TypeSetting.fullscreen)
         {
-            isClick = PlayerPrefs.GetInt("Fullscreen", IsClick ? 1 : 0) != 0;
-            if(SettingManager.Kostil)
+            isClick = SettingManager.SettingStorage.LoadFullscreen();
+            if (SettingManager.IsDefaultSetting)
             {
                 isClick = SettingManager.Instance.DefaultSettingData.DefaultSetting.FullScreen;
             }
         }
-        else if(IdButton == "music")
+        else if(_settingKey == TypeSetting.music)
         {
-            isClick = PlayerPrefs.GetInt("Music", IsClick ? 1 : 0) != 0;
-            if (SettingManager.Kostil)
+            isClick = SettingManager.SettingStorage.LoadMusic();
+            if (SettingManager.IsDefaultSetting)
             {
                 isClick = SettingManager.Instance.DefaultSettingData.DefaultSetting.Music;
             }
         }
-        else if(IdButton == "sound")
+        else if(_settingKey == TypeSetting.sound)
         {
-            isClick = PlayerPrefs.GetInt("Sound", IsClick ? 1 : 0) != 0;
-            if (SettingManager.Kostil)
+            isClick = SettingManager.SettingStorage.LoadSound();
+            if (SettingManager.IsDefaultSetting)
             {
                 isClick = SettingManager.Instance.DefaultSettingData.DefaultSetting.Sound;
             }
@@ -50,7 +51,7 @@ public class BtnTgl: BaseButton, IInvoke
     }
     private void RegisterSetting()
     {
-        SettingManager.RegisterSetting(IdButton, IsClick);
+        SettingManager.RegisterSetting(_settingKey, IsClick);
     }
     void ChoseSprite()
     {
@@ -58,7 +59,7 @@ public class BtnTgl: BaseButton, IInvoke
         {
             _image = GetComponent<Image>();
         }
-        if (IdButton == "fullscreen")
+        if (_settingKey == TypeSetting.fullscreen)
         {
             _image.sprite = IsClick ?  SpriteManager.SpriteTglOff : SpriteManager.SpriteTglOn;
         }

@@ -1,5 +1,7 @@
 ﻿using Assets.Scripts.Core.Base;
+using Assets.Scripts.Core.Enums;
 using Assets.Scripts.Core.Interface;
+using Assets.Scripts.Data.SettingsDatas;
 using System;
 using UnityEngine;
 
@@ -8,26 +10,24 @@ namespace Assets.Scripts.UI.Dropdown
 	public class DDResolution : BaseDropDown, IInvoke
 	{
         [SerializeField] private string _invokeKey = "setting";
+        [SerializeField] private TypeSetting _settingKey = TypeSetting.resolution;
         public void Invoke()
         {
             try
             {
-                int width = PlayerPrefs.GetInt("Width", 1920);
-                int height = PlayerPrefs.GetInt("Height", 1080);
-                string resolution = $"{width}:{height}";
-                if(SettingManager.Kostil) //Добавлено
+                ResolutionData resolution = SettingManager.SettingStorage.LoadResolution();
+                if(SettingManager.IsDefaultSetting) //Добавлено
                 {
-                    width = SettingManager.DefaultSettingData.DefaultSetting.Resolution.Width; //Добавлено
-                    height = SettingManager.DefaultSettingData.DefaultSetting.Resolution.Height; //Добавлено
-                    resolution = $"{width}:{height}"; //Добавлено
+                    resolution = SettingManager.DefaultSettingData.DefaultSetting.Resolution;
                 }
+                string resolutionString = $"{resolution.Width}:{resolution.Height}";
                 for (int i = 0; i < ThisDropdown.options.Count; i++) 
                 {
                     if (ThisDropdown.options[i] == null)
                     {
                         continue;
                     }
-                    if (ThisDropdown.options[i].text == resolution)
+                    if (ThisDropdown.options[i].text == resolutionString)
                     {
                         ThisDropdown.value = i;
                     }
@@ -43,7 +43,7 @@ namespace Assets.Scripts.UI.Dropdown
             try
             {
                 string value = ThisDropdown.options[index].text;
-                SettingManager.RegisterSetting(IdDropDowm, value);
+                SettingManager.RegisterSetting(_settingKey, value);
                 Debug.Log("Меня кликнули!");
             }
             catch (Exception e)
