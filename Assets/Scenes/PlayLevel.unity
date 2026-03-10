@@ -3704,28 +3704,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Core.Manager.LevelManager
   _datasLevel: {fileID: 11400000, guid: 9779a30c58dfaf1488b00822f8e1f04f, type: 2}
-  _allObjects:
-  - {fileID: 6778447248962194935, guid: c8e41469c0d26894e980c771ea93f75a, type: 3}
-  - {fileID: 4180221870512970960, guid: 0a489bc77fcebf348b60af995e333f41, type: 3}
-  - {fileID: 8292547717264767924, guid: fd185e993b3e71f4cae328643b4609da, type: 3}
-  - {fileID: 7126341402135370654, guid: ae093d41b432c9f4bab4e0becc7e06dd, type: 3}
-  - {fileID: 8290846511829851081, guid: 6f596d6382acb4b40bb1dd29d4f6284f, type: 3}
-  - {fileID: 8241841685319354819, guid: 5f5bbc5750b45184cb784455eefa83d6, type: 3}
-  - {fileID: 3721102386570214710, guid: 04459c3fe53a4da4a9cf675ba475877b, type: 3}
-  - {fileID: 2544648593639072328, guid: 3a6288d4b36048e4987abfdc95964f48, type: 3}
-  - {fileID: 8241841685319354819, guid: 5f5bbc5750b45184cb784455eefa83d6, type: 3}
-  - {fileID: 8241841685319354819, guid: 5f5bbc5750b45184cb784455eefa83d6, type: 3}
-  - {fileID: 3721102386570214710, guid: 04459c3fe53a4da4a9cf675ba475877b, type: 3}
-  - {fileID: 4180221870512970960, guid: 0a489bc77fcebf348b60af995e333f41, type: 3}
-  - {fileID: 3721102386570214710, guid: 04459c3fe53a4da4a9cf675ba475877b, type: 3}
-  - {fileID: 801733500052454447, guid: bd4ce033e1ef6ad4cb5a7d20c27c247b, type: 3}
-  - {fileID: 504485626192572246, guid: cf773b5645916d14d9a153e70ad25ef1, type: 3}
-  _allTypesCar:
-  - {fileID: 286638946415238250, guid: a822982d14a49bc42a0f7c4395804e99, type: 3}
-  - {fileID: 286638946415238250, guid: 4db707369bc3ecf448703e68852f671d, type: 3}
-  - {fileID: 286638946415238250, guid: 034dcec99328b7a4e85385ada562a14a, type: 3}
-  _prefabFinish: {fileID: 6886300439332160493, guid: ce954adba000a914082b734cb56f483c, type: 3}
-  CurrentCar: {fileID: 0}
   _gameWinPanel: {fileID: 1996777981}
   _gameLosePanel: {fileID: 1764448727}
   _objectActive:
@@ -3733,6 +3711,7 @@ MonoBehaviour:
   - {fileID: 826256210}
   - {fileID: 2125547343}
   - {fileID: 399490147}
+  _configuration: {fileID: 11400000, guid: a5edb5b18f2ccca40839ab1bff9450d6, type: 2}
 --- !u!1 &1601421367 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5119aa57ee02ed4449095be383294a0a, type: 3}

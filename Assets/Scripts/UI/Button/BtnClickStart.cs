@@ -14,14 +14,7 @@ namespace Assets.Scripts.UI.Button
                 Debug.LogError("LevelManager.Instance == null", this);
                 return;
             }
-            var objects =  LevelManager.Instance.ObjectActive;
-            foreach( var obj in objects)
-            {
-                if(obj != null)
-                {
-                    obj.SetActive(false);
-                }
-            }
+            LevelManager.Instance.UiLevelManager.HideAllPanels();
             if (InvokeManager.Instance == null)
             {
                 Debug.LogError("InvokeManager.Instance == null", this);

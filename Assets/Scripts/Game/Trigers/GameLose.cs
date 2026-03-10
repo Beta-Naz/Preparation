@@ -24,7 +24,7 @@ namespace Assets.Scripts.Game.Trigers
                 if (LevelManager != null)
                 {
                     PlayerPrefs.SetInt("CurrentLevel", 0);
-                    LevelManager.GameLosePanel.SetActive(true);
+                    LevelManager.UiLevelManager.ShowLosePanel();
                     InvokeManager.IsStart = false;
                 }
             }

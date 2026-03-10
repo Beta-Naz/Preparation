@@ -6899,6 +6899,7 @@ MonoBehaviour:
   IdButton: music
   IsClick: 1
   _invokeKey: setting
+  _settingKey: 3
 --- !u!1 &964459522
 GameObject:
   m_ObjectHideFlags: 0
@@ -8057,6 +8058,7 @@ MonoBehaviour:
   IdButton: sound
   IsClick: 1
   _invokeKey: setting
+  _settingKey: 2
 --- !u!1 &1099518684
 GameObject:
   m_ObjectHideFlags: 0
@@ -8760,6 +8762,7 @@ MonoBehaviour:
   IdButton: fullscreen
   IsClick: 1
   _invokeKey: setting
+  _settingKey: 0
 --- !u!1 &1211734559
 GameObject:
   m_ObjectHideFlags: 0
@@ -11550,6 +11553,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.UI.Dropdown.DDResolution
   IdDropDowm: resolution
   _invokeKey: setting
+  _settingKey: 1
 --- !u!1 &1626411617
 GameObject:
   m_ObjectHideFlags: 0
@@ -15316,6 +15320,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DDLanguage
   IdDropDowm: language
   _invokeKey: setting
+  _settingKey: 4
 --- !u!1 &2104026743
 GameObject:
   m_ObjectHideFlags: 0

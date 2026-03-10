@@ -1,38 +1,33 @@
 ﻿using Assets.Scripts.Core.Interface;
+using Assets.Scripts.Core.Interface.Game;
 using Assets.Scripts.Data;
-using NUnit.Framework;
-using System.Collections;
-using System.Collections.Generic;
+using Assets.Scripts.Game.Level;
 using UnityEngine;
 
 namespace Assets.Scripts.Core.Manager
 {
 	public class LevelManager: MonoBehaviour, IInitializable
 	{
-		public static LevelManager Instance { get; private set; }
-		[SerializeField] private DatasLevel _datasLevel;
-		[SerializeField] private GameObject[] _allObjects;
-		[SerializeField] private GameObject[] _allTypesCar;
-        [SerializeField] private GameObject _prefabFinish;
-
-        private List<GameObject> _currentSpawnObject = new();
-		public GameObject CurrentCar;
-
+		public static LevelManager Instance { get; private set; } 
+        public GameObject CurrentCar { get; private set; }
+        [SerializeField] private DatasLevel _datasLevel;
         [SerializeField] private GameObject _gameWinPanel;
-        public GameObject GameWinPanel => _gameWinPanel;
-
         [SerializeField] private GameObject _gameLosePanel;
-        public GameObject GameLosePanel => _gameLosePanel;
-
-
         [SerializeField] private GameObject[] _objectActive;
-        public GameObject[] ObjectActive => _objectActive;
+        [SerializeField] private GameConfiguration _configuration;
+        private ILevelDataProvider _levelDataProvider;
+        private IObjectFactory _objectFactory;
+        private ILevelUIManager _uiLevelManager;
+        public ILevelUIManager UiLevelManager => _uiLevelManager;
         private void Awake()
 		{
 			Initialize();
-            int levelIndex = PlayerPrefs.GetInt("CurrentLevel", 0);
+            int levelIndex = PlayerPrefs.GetInt("CurrentLevel", 0); //Костыль, пока оставлю как есть
             CreateLevel(levelIndex);
         }
+        /// <summary>
+        /// Стандартный метод инциализации для менеджера, инициализируется в BaseManager
+        /// </summary>
         public void Initialize()
         {
             if (Instance != null && Instance != this)
@@ -41,126 +36,73 @@ namespace Assets.Scripts.Core.Manager
                 return;
             }
             Instance = this;
+            _levelDataProvider = new LevelDataProvider(_datasLevel);
+            _objectFactory = new GameObjectFactory(_configuration);
+            _uiLevelManager = new LevelUIManager(_gameWinPanel, _gameLosePanel, _objectActive);
             Debug.Log($"LevelManager успешно инициализирован");
         }
+        /// <summary>
+        /// Создание уровня
+        /// </summary>
+        /// <param name="levelIndex">номер уровня</param>
         public void CreateLevel(int levelIndex)
         {
-            if(_datasLevel == null)
+            try
             {
-                Debug.LogError("_datasLevel == null", this);
-                return;
+                if (!_levelDataProvider.HasLevel(levelIndex))
+                {
+                    levelIndex = 0;
+                    if (!_levelDataProvider.HasLevel(levelIndex))
+                    {
+                        Debug.LogError("Нет доступных уровней");
+                        return;
+                    }
+                }
+                var levelData = _levelDataProvider.GetLevel(levelIndex);
+                var lastObject = CreateObjectsFromData(levelData.Objects);
+                if (lastObject != null)
+                {
+                    var finishPosition = lastObject.transform.position + new Vector3(0, 0.3f, 0);
+                    _objectFactory.CreateFinish(finishPosition);
+                }
+                CurrentCar = _objectFactory.CreateCar(levelData.CarData);
             }
-            _datasLevel.LoadFromJson();
-            if (_datasLevel.Levels == null && _datasLevel.Levels.Count > 0)
+            catch (System.Exception e)
             {
-                Debug.LogError("_datasLevel.Levels == null", this);
-                return;
+                Debug.LogError($"Ошибка при создании уровня: {e.Message}");
             }
-            if(_datasLevel.Levels.Count < levelIndex)
-            {
-                levelIndex = 0;
-            }
-            if (_allObjects == null && _allObjects.Length == 0)
-            {
-                Debug.LogError("_allObjects == null", this);
-                return;
-            }
-            if (_allTypesCar == null && _allTypesCar.Length == 0)
-            {
-                Debug.LogError("_allTypesCar == null", this);
-                return;
-            }
-            CreateObjects(levelIndex);
-            CreateCar(_datasLevel.Levels[levelIndex].CarData);
         }
-        private void CreateObjects(int levelIndex)
+        /// <summary>
+        /// Спавн для объектов
+        /// </summary>
+        /// <param name="objectsData">Все объекты, которые есть на LevelData</param>
+        /// <returns></returns>
+        private GameObject CreateObjectsFromData(Objects objectsData)
         {
-            Debug.Log("Начанием создавать объекты", this);
-            Objects objects = _datasLevel.Levels[levelIndex].Objects;
-            float maxX = float.MinValue;
+            if (objectsData?.ObjectData == null)
+                return null;
+
             GameObject lastObject = null;
-            foreach (var obj in objects.ObjectData)
+            float maxX = float.MinValue;
+
+            foreach (var objData in objectsData.ObjectData)
             {
-                if(obj != null)
-                {
-                    if(_allObjects.Length > obj.ObjectType)
-                    {
-                        GameObject prefab = _allObjects[obj.ObjectType];
-                        if(prefab != null)
-                        {
-                            GameObject newObject = Instantiate(prefab);
-                            newObject.transform.position = obj.Position.ToVector();
-                            newObject.transform.eulerAngles = obj.Rotation.ToVector();
-                            newObject.transform.localScale = obj.Scale.ToVector();
-                            _currentSpawnObject.Add(newObject);
-                            if(newObject.transform.position.x > maxX && newObject.transform.position.z < 4)
-                            {
-                                maxX = newObject.transform.position.x;
-                                lastObject = newObject;
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogWarning("prefab == null", this);
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("_allObjects.Length < obj.ObjectType", this);
-                        continue;
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("obj == null", this);
+                if (objData == null)
                     continue;
+
+                var newObject = _objectFactory.CreateObject(objData);
+                if (newObject != null)
+                {
+                    // Логика определения последнего объекта
+                    if (newObject.transform.position.x > maxX &&
+                        newObject.transform.position.z < 4)
+                    {
+                        maxX = newObject.transform.position.x;
+                        lastObject = newObject;
+                    }
                 }
             }
-            CreateFinish(lastObject);
-        }
-        private void CreateFinish(GameObject obj)
-        {
-            if (obj == null)
-            {
-                Debug.LogError("obj == null", this);
-                return;
-            }
-            if(_prefabFinish != null)
-            {
-                GameObject finishObject = Instantiate(_prefabFinish, obj.transform);
-                finishObject.transform.localPosition = new Vector3(0, 0.3f, 0);
-            }
-            else
-            {
-                Debug.LogError("_prefabFinish == null", this);
-                return;
-            }
-        }
-        private void CreateCar(CarData car)
-        {
-            if(car == null)
-            {
-                Debug.LogError("car == null", this);
-                return;
-            }
-            if(_allTypesCar.Length < car.CarModelIndex)
-            {
-                Debug.LogError("_allTypesCar.Length < car.CarModelIndex", this);
-                return;
-            }
-            GameObject prefabCar = _allTypesCar[car.CarModelIndex];
-            if(prefabCar == null)
-            {
-                Debug.LogError("prefabCar == null", this);
-                return;
-            }
-            GameObject carObject = Instantiate(prefabCar);
-            Rigidbody2D rigid = carObject.AddComponent<Rigidbody2D>();
-            rigid.gravityScale = 10;
-            carObject.transform.position = new Vector3(0, 0.5f, 0);
-            carObject.AddComponent<Move>();
-            CurrentCar = carObject;
+            return lastObject;
         }
     }
 }
